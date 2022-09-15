@@ -9,6 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/")
 public class MainController {
@@ -33,5 +36,16 @@ public class MainController {
         return new ResponseEntity<>(
                 cctvService.getCCTVDetails(),
                 HttpStatus.BAD_REQUEST);
+        /*
+        Вариант с отправкой текстового файла
+        String res = cctvService.getCCTVDetails().stream().
+                map(item -> item.toString()).
+                collect(Collectors.joining("<br/>"));
+
+        return new ResponseEntity<>(
+                res,
+                HttpStatus.BAD_REQUEST);
+        */
+
     }
 }

@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
-@Component
 @Data
 @AllArgsConstructor
 public class CCTVDTO {
@@ -16,12 +15,12 @@ public class CCTVDTO {
 
     @Override
     public String toString() {
-        return "\n{" +
-                "\n'id': " + id +
-                "\n'UrlType': " + UrlType +
-                "\n'videoUrl': " + videoUrl +
-                "\n'value': " + value +
-                "\n'ttl': " + ttl +
-                "\n}";
+        return "<br/>{" +
+                "<br/>  'id': " + id +
+                "<br/>  'UrlType': " + UrlType +
+                "<br/>  'videoUrl': " + videoUrl +
+                "<br/>  'value': " + value +
+                "<br/>  'ttl': " + ttl +
+                "<br/>}";
     }
 }
