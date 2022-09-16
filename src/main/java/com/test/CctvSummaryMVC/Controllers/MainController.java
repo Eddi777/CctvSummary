@@ -1,5 +1,7 @@
 package com.test.CctvSummaryMVC.Controllers;
 
+import com.test.CctvSummaryMVC.Models.CCTV;
+import com.test.CctvSummaryMVC.Models.CCTVDTO;
 import com.test.CctvSummaryMVC.Service.CCTVService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
@@ -25,17 +26,17 @@ public class MainController {
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCCTVList(){
+    public ResponseEntity<Set<CCTV>> getCCTVList(){
         return new ResponseEntity<>(
                 cctvService.getCCTVList(),
                 HttpStatus.OK);
     }
 
     @GetMapping("/")
-    public ResponseEntity<?> getCCTVData(){
+    public ResponseEntity<Set<CCTVDTO>> getCCTVData(){
         return new ResponseEntity<>(
                 cctvService.getCCTVDetails(),
-                HttpStatus.BAD_REQUEST);
+                HttpStatus.OK);
         /*
         Вариант с отправкой текстового файла
         String res = cctvService.getCCTVDetails().stream().
