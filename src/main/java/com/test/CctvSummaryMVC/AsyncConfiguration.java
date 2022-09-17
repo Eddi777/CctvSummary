@@ -1,7 +1,13 @@
+package com.test.CctvSummaryMVC;
+
 import java.lang.reflect.Method;
+import java.util.concurrent.Executor;
+
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @EnableAsync
@@ -26,18 +32,11 @@ public class AsyncConfiguration extends AsyncConfigurerSupport {
             public void handleUncaughtException(Throwable ex,
                                                 Method method, Object... params) {
 
-//Используйте здесь ваш любимый Logger
-//Задавайте удобный для вас формат логирования
-
-//Здесь для простоты примера использован метод System.out.println
-
+                    //Logger выводит на консоль
                 System.out.println("Exception: " + ex.getMessage());
                 System.out.println("Method Name: " + method.getName());
                 ex.printStackTrace();
             }
         };
-    }}
-
-
-
+    }
 }

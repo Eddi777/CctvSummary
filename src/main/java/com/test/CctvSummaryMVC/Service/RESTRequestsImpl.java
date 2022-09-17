@@ -2,10 +2,12 @@ package com.test.CctvSummaryMVC.Service;
 
 import com.test.CctvSummaryMVC.Models.CCTV;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.CompletableFuture;
 
+@Service
 public class RESTRequestsImpl implements RESTRequests {
 
     RestTemplate restTemplate;

@@ -21,10 +21,12 @@ public class CCTVServiceImpl {
 
     final RestTemplate restTemplate;
     final CCTVtoCCTVDTO cctVtoCCTVDTO;
+    final RESTRequests restRequests;
 
-    public CCTVServiceImpl(RestTemplate restTemplate, CCTVtoCCTVDTO cctVtoCCTVDTO) {
+    public CCTVServiceImpl(RestTemplate restTemplate, CCTVtoCCTVDTO cctVtoCCTVDTO, RESTRequests restRequests) {
         this.restTemplate = restTemplate;
         this.cctVtoCCTVDTO = cctVtoCCTVDTO;
+        this.restRequests = restRequests;
     }
 
     private Map<Integer, CCTV> cctvMap = new ConcurrentHashMap<>();
