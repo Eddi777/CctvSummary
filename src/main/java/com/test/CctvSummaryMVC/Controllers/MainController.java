@@ -2,7 +2,7 @@ package com.test.CctvSummaryMVC.Controllers;
 
 import com.test.CctvSummaryMVC.Models.CCTV;
 import com.test.CctvSummaryMVC.Models.CCTVDTO;
-import com.test.CctvSummaryMVC.Service.CCTVService;
+import com.test.CctvSummaryMVC.Service.CCTVServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,25 +17,25 @@ import java.util.Set;
 @RequestMapping("/")
 public class MainController {
 
-    final CCTVService cctvService;
+    final CCTVServiceImpl cctvServiceImpl;
     final RestTemplate restTemplate;
 
-    public MainController(CCTVService cctvService, RestTemplate restTemplate) {
-        this.cctvService = cctvService;
+    public MainController(CCTVServiceImpl cctvServiceImpl, RestTemplate restTemplate) {
+        this.cctvServiceImpl = cctvServiceImpl;
         this.restTemplate = restTemplate;
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Set<CCTV>> getCCTVList(){
         return new ResponseEntity<>(
-                cctvService.getCCTVList(),
+                cctvServiceImpl.getCCTVList(),
                 HttpStatus.OK);
     }
 
     @GetMapping("/")
     public ResponseEntity<Set<CCTVDTO>> getCCTVData(){
         return new ResponseEntity<>(
-                cctvService.getCCTVDetails(),
+                cctvServiceImpl.getCCTVDetails(),
                 HttpStatus.OK);
     }
 }
