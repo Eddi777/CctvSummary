@@ -32,7 +32,7 @@ public class MainController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/")
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Set<CCTVDTO>> getCCTVData(){
         return new ResponseEntity<>(
                 cctvServiceImpl.getCCTVDetails(),
