@@ -53,7 +53,6 @@ public class CCTVServiceImpl {
         }
         if ((System.nanoTime() - cctvLastUpdateTime) > CCTV_LIST_UPDATE_PERIOD) {
             updateCCTVList();
-            cctvLastUpdateTime = System.nanoTime();
         }
         for (CCTV cctv: cctvMap.values()) {
             if ((System.nanoTime() - cctv.getLastCheckTime()) > CCTV_DATA_UPDATE_PERIOD ||
@@ -98,6 +97,7 @@ public class CCTVServiceImpl {
                     }).
                     collect(Collectors.toMap(CCTV::getId, Function.identity()));
         }
+        cctvLastUpdateTime = System.nanoTime();
     }
 
     private void cctvUpdate(CCTV oCCTV) {
