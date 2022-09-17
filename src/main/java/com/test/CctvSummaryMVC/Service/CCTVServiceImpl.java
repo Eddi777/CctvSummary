@@ -7,10 +7,13 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -72,9 +75,10 @@ public class CCTVServiceImpl {
         CCTV[] resp = null;
         try {
             resp = restRequests.getCCTVList(START_POINT).get();
-        } catch (ExecutionException | InterruptedException e) {
+            System.out.println(Arrays.toString(resp));
+        } catch (InterruptedException | ExecutionException ex) {
             System.out.println("Start point is wrong");
-            System.out.println(e);
+            System.out.println(ex);
         }
         if (resp != null) {
             cctvMap.putAll(
@@ -84,35 +88,34 @@ public class CCTVServiceImpl {
                             return item;
                             }).
                             collect(Collectors.toMap(CCTV::getId, Function.identity())));
-            for (CCTV item: cctvMap.values()){
-                try {
-                    restRequests.getCCTVData(item, item.getSourceDataUrl()).
-                            thenApply(respCCTV -> {
-                                cctvMap.get(item.getId()).setUrlType(respCCTV.getUrlType());
-                                cctvMap.get(item.getId()).setVideoUrl(respCCTV.getVideoUrl());
-                                return null;
-                            });
-                } catch (InterruptedException e) {
-                    System.out.println("CCTV point is out of service " + item.getSourceDataUrl());
-                    System.out.println(e);
-                }
-                try {
-                    restRequests.getCCTVData(item, item.getTokenDataUrl()).
-                            thenApply(respCCTV -> {
-                                cctvMap.get(item.getId()).setValue(respCCTV.getValue());
-                                cctvMap.get(item.getId()).setTtl(respCCTV.getTtl());
-                                return null;
-                            });
+            List<CompletableFuture<CCTV>> lst = new ArrayList<>();
+            for (int i: cctvMap.keySet()){
+                CompletableFuture<CCTV> r1 = restRequests.
+                        getCCTVData(cctvMap.get(i), cctvMap.get(i).getSourceDataUrl()).
+                        thenApply(item -> {
+                            cctvMap.get(i).setUrlType(item.getUrlType());
+                            cctvMap.get(i).setVideoUrl(item.getVideoUrl());
+                            return null;
+                        });
+                lst.add(r1);
+                CompletableFuture<CCTV> r2 = restRequests.
+                        getCCTVData(cctvMap.get(i), cctvMap.get(i).getTokenDataUrl()).
+                        thenApply(respCCTV -> {
+                            cctvMap.get(i).setValue(respCCTV.getValue());
+                            cctvMap.get(i).setTtl(respCCTV.getTtl());
+                            return null;
+                        });
 
-                } catch (InterruptedException e) {
-                    System.out.println("CCTV point is out of service " + item.getTokenDataUrl());
-                    System.out.println(e);
-                }
-                cctvMap.get(item.getId()).setChanged(false);
-                cctvMap.get(item.getId()).setLastCheckTime(System.nanoTime());
+                lst.add(r2);
+                cctvMap.get(i).setChanged(false);
+                cctvMap.get(i).setLastCheckTime(System.nanoTime());
             }
+            CompletableFuture.allOf(lst.toArray(new CompletableFuture[0]))
+                    .exceptionally(ex -> null)
+                    .join();
         }
         cctvLastUpdateTime = System.nanoTime();
+        System.out.println(cctvMap);
     }
 
     private void updateCCTVList() {

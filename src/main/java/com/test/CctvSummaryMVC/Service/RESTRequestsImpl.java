@@ -19,27 +19,22 @@ public class RESTRequestsImpl implements RESTRequests {
 
     @Async
     @Override
-    public CompletableFuture<CCTV[]> getCCTVList(final String startPoint) throws InterruptedException {
-        CCTV[] resp = restTemplate.getForObject(
-                startPoint,
-                CCTV[].class);
-        if (resp == null) {
-            throw new InterruptedException();
-        } else {
-            return CompletableFuture.completedFuture(resp);
-        }
+    public CompletableFuture<CCTV[]> getCCTVList(final String startPoint) {
+        return CompletableFuture.supplyAsync(() -> {
+            return restTemplate.getForObject(
+                    startPoint,
+                    CCTV[].class);
+        });
+
     }
 
     @Async
     @Override
-    public CompletableFuture<CCTV> getCCTVData(final CCTV cctv, final String requestName) throws InterruptedException {
-        CCTV resp = restTemplate.getForObject(
-                requestName,
+    public CompletableFuture<CCTV> getCCTVData(final CCTV cctv, String url) {
+        return CompletableFuture.supplyAsync(() -> {
+            return restTemplate.getForObject(
+                url,
                 CCTV.class);
-        if (resp == null) {
-            throw new InterruptedException();
-        } else {
-            return CompletableFuture.completedFuture(resp);
-        }
+        });
     }
 }

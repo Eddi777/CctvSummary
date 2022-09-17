@@ -7,7 +7,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface RESTRequests {
     @Async
-    CompletableFuture<CCTV[]> getCCTVList(final String startPoint) throws InterruptedException;
+    CompletableFuture<CCTV[]> getCCTVList(final String startPoint);
+
     @Async
-    CompletableFuture<CCTV> getCCTVData(CCTV cctv, String requestName) throws InterruptedException;
+    CompletableFuture<CCTV> getCCTVData(CCTV cctv, String url);
 }
