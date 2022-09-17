@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,7 @@ public class CCTVServiceImpl {
         }
         return new HashSet<>(cctvMap.values());
     }
+
     public Set<CCTVDTO> getCCTVDetails(){
         if (cctvMap.isEmpty()) {
             firstFillCCTVList();
@@ -67,20 +69,49 @@ public class CCTVServiceImpl {
     }
 
     private void firstFillCCTVList() {
-        CCTV[] resp = restTemplate.getForObject(
-                START_POINT,
-                CCTV[].class);
-        if (resp == null){
+        CCTV[] resp = null;
+        try {
+            resp = restRequests.getCCTVList(START_POINT).get();
+        } catch (ExecutionException | InterruptedException e) {
             System.out.println("Start point is wrong");
-        } else {
-            cctvMap = Arrays.stream(resp).
-                    map(item -> {
-                        item.setChanged(true);
-                        return item;
-                    }).
-                    collect(Collectors.toMap(CCTV::getId, Function.identity()));
+            System.out.println(e);
         }
+        if (resp != null) {
+            cctvMap.putAll(
+                    Arrays.stream(resp).
+                            map(item -> {
+                            item.setChanged(true);
+                            return item;
+                            }).
+                            collect(Collectors.toMap(CCTV::getId, Function.identity())));
+            for (CCTV item: cctvMap.values()){
+                try {
+                    restRequests.getCCTVData(item, item.getSourceDataUrl()).
+                            thenApply(respCCTV -> {
+                                cctvMap.get(item.getId()).setUrlType(respCCTV.getUrlType());
+                                cctvMap.get(item.getId()).setVideoUrl(respCCTV.getVideoUrl());
+                                return null;
+                            });
+                } catch (InterruptedException e) {
+                    System.out.println("CCTV point is out of service " + item.getSourceDataUrl());
+                    System.out.println(e);
+                }
+                try {
+                    restRequests.getCCTVData(item, item.getTokenDataUrl()).
+                            thenApply(respCCTV -> {
+                                cctvMap.get(item.getId()).setValue(respCCTV.getValue());
+                                cctvMap.get(item.getId()).setTtl(respCCTV.getTtl());
+                                return null;
+                            });
 
+                } catch (InterruptedException e) {
+                    System.out.println("CCTV point is out of service " + item.getTokenDataUrl());
+                    System.out.println(e);
+                }
+                cctvMap.get(item.getId()).setChanged(false);
+                cctvMap.get(item.getId()).setLastCheckTime(System.nanoTime());
+            }
+        }
         cctvLastUpdateTime = System.nanoTime();
     }
 
