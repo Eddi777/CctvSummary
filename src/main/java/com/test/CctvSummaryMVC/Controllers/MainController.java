@@ -37,16 +37,5 @@ public class MainController {
         return new ResponseEntity<>(
                 cctvService.getCCTVDetails(),
                 HttpStatus.OK);
-        /*
-        Вариант с отправкой текстового файла
-        String res = cctvService.getCCTVDetails().stream().
-                map(item -> item.toString()).
-                collect(Collectors.joining("<br/>"));
-
-        return new ResponseEntity<>(
-                res,
-                HttpStatus.BAD_REQUEST);
-        */
-
     }
 }
