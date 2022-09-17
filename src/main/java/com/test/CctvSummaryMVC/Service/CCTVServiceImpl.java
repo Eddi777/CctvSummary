@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +28,6 @@ public class CCTVServiceImpl {
     }
 
     private Map<Integer, CCTV> cctvMap = new ConcurrentHashMap<>();
-
     @Value("${app.CCTV_DATA_UPDATE_PERIOD}")
     private long CCTV_DATA_UPDATE_PERIOD; //Duration between update each CCTV, 10 sec
     @Value("${app.CCTV_LIST_UPDATE_PERIOD}")
@@ -80,6 +78,8 @@ public class CCTVServiceImpl {
                     }).
                     collect(Collectors.toMap(CCTV::getId, Function.identity()));
         }
+
+        cctvLastUpdateTime = System.nanoTime();
     }
 
     private void updateCCTVList() {
