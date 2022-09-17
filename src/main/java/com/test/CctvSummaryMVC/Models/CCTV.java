@@ -18,7 +18,4 @@ public class CCTV {
     String tokenDataUrl;
     String value;
     int ttl;
-
-    long lastCheckTime; //время последнего опроса камеры
-    boolean isChanged = false; // Признак изменения данных камеры (sourceDataUrl или tokenDataUrl);
 }
