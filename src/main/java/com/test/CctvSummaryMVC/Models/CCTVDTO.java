@@ -15,12 +15,12 @@ public class CCTVDTO {
 
     @Override
     public String toString() {
-        return "<br/>{" +
-                "<br/>  'id': " + id +
-                "<br/>  'UrlType': " + UrlType +
-                "<br/>  'videoUrl': " + videoUrl +
-                "<br/>  'value': " + value +
-                "<br/>  'ttl': " + ttl +
-                "<br/>}";
+        return "{" +
+                "'id': " + id +
+                "'UrlType': " + UrlType +
+                "'videoUrl': " + videoUrl +
+                "'value': " + value +
+                "'ttl': " + ttl +
+                "}";
     }
 }

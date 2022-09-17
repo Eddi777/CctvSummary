@@ -1,6 +1,8 @@
 package com.test.CctvSummaryMVC.Controllers;
 
-import com.test.CctvSummaryMVC.Service.CCTVService;
+import com.test.CctvSummaryMVC.Models.CCTV;
+import com.test.CctvSummaryMVC.Models.CCTVDTO;
+import com.test.CctvSummaryMVC.Service.CCTVServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,42 +12,30 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/")
 public class MainController {
 
-    final CCTVService cctvService;
+    final CCTVServiceImpl cctvServiceImpl;
     final RestTemplate restTemplate;
 
-    public MainController(CCTVService cctvService, RestTemplate restTemplate) {
-        this.cctvService = cctvService;
+    public MainController(CCTVServiceImpl cctvServiceImpl, RestTemplate restTemplate) {
+        this.cctvServiceImpl = cctvServiceImpl;
         this.restTemplate = restTemplate;
     }
 
     @GetMapping(value = "/list", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCCTVList(){
+    public ResponseEntity<Set<CCTV>> getCCTVList(){
         return new ResponseEntity<>(
-                cctvService.getCCTVList(),
+                cctvServiceImpl.getCCTVList(),
                 HttpStatus.OK);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<?> getCCTVData(){
+    @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Set<CCTVDTO>> getCCTVData(){
         return new ResponseEntity<>(
-                cctvService.getCCTVDetails(),
-                HttpStatus.BAD_REQUEST);
-        /*
-        Вариант с отправкой текстового файла
-        String res = cctvService.getCCTVDetails().stream().
-                map(item -> item.toString()).
-                collect(Collectors.joining("<br/>"));
-
-        return new ResponseEntity<>(
-                res,
-                HttpStatus.BAD_REQUEST);
-        */
-
+                cctvServiceImpl.getCCTVDetails(),
+                HttpStatus.OK);
     }
 }
