@@ -47,7 +47,7 @@ public class CCTVServiceImpl {
             firstFillCCTVList();
         }
         if ((System.nanoTime() - cctvLastUpdateTime) > CCTV_LIST_UPDATE_PERIOD) {
-            updateCCTVList();
+            cctvListUpdate();
         }
         return new HashSet<>(cctvMap.values());
     }
@@ -57,7 +57,7 @@ public class CCTVServiceImpl {
             firstFillCCTVList();
         }
         if ((System.nanoTime() - cctvLastUpdateTime) > CCTV_LIST_UPDATE_PERIOD) {
-            updateCCTVList();
+            cctvListUpdate();
         }
         for (CCTV cctv: cctvMap.values()) {
             if ((System.nanoTime() - cctv.getLastCheckTime()) > CCTV_DATA_UPDATE_PERIOD ||
@@ -72,15 +72,16 @@ public class CCTVServiceImpl {
     }
 
     private void firstFillCCTVList() {
-        CCTV[] resp = null;
+        CCTV[] resp = new CCTV[0];
         try {
             resp = restRequests.getCCTVList(START_POINT).get();
-            System.out.println(Arrays.toString(resp));
-        } catch (InterruptedException | ExecutionException ex) {
-            System.out.println("Start point is wrong");
-            System.out.println(ex);
+        } catch (InterruptedException | ExecutionException e) {
         }
-        if (resp != null) {
+//        System.out.println(Arrays.toString(resp));
+        if (resp == null) {
+            System.out.println("Start point is broken");
+            cctvMap.put(1, new CCTV());
+        }else {
             cctvMap.putAll(
                     Arrays.stream(resp).
                             map(item -> {
@@ -115,25 +116,17 @@ public class CCTVServiceImpl {
                     .join();
         }
         cctvLastUpdateTime = System.nanoTime();
-        System.out.println(cctvMap);
+//        System.out.println(cctvMap);
     }
 
-    private void updateCCTVList() {
-        CCTV[] resp = restTemplate.getForObject(
-                START_POINT,
-                CCTV[].class);
-        if (resp == null){
-            System.out.println("Start point is out of service");
-            cctvLastUpdateTime = System.nanoTime();
-        } else {
-            cctvMap = Arrays.stream(resp).
-                    map(item -> {
-                        item.setChanged(true);
-                        return item;
-                    }).
-                    collect(Collectors.toMap(CCTV::getId, Function.identity()));
-        }
-        cctvLastUpdateTime = System.nanoTime();
+    private void cctvListUpdate() {
+        restRequests.getCCTVList(START_POINT).
+                thenApply(items -> {
+                    for (CCTV cctv : items) {
+                        cctvUpdate(cctv);
+                    }
+                    return null;
+                });
     }
 
     private void cctvUpdate(CCTV oCCTV) {
