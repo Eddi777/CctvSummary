@@ -67,6 +67,7 @@ public class CCTVServiceImpl {
         try {
             resp = restRequests.getCCTVList(START_POINT).get();
         } catch (InterruptedException | ExecutionException e) {
+            System.out.println("Start point is broken");
         }
         if (resp == null) {
             System.out.println("Start point is broken");
